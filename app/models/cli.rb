@@ -64,7 +64,10 @@ class CLI
               check = @user.friends.map(&:name).include?(temp_target_friend.to_s)
               if check
                 @user.delete_friend_by_name(temp_target_friend)
+                puts ""
+                puts "You and #{temp_target_friend} are no longer friends..."
               else
+                puts ""
                 puts "You and #{temp_target_friend} are not friend. AT ALL"
             end
       end
@@ -72,33 +75,58 @@ class CLI
 
       def reviews_operations
         puts ""
-        choice = @prompt.select("Select one of the following:", ["Browse my reviews", "Add new Review", "Return to main menu"])
+        choice = @prompt.select("Select one of the following:", ["Browse my reviews", "Add new Review", "Return to main menu", "Delete an existing review", "Update an existing review"])
         if choice == "Add new Review"
           temp_target_movie = @prompt.ask("What movie would you like to review?").strip
-          if Movie.all.map(&:title).include?(temp_target_movie)
-            target_movie = temp_target_movie
-          else
-            puts "Movie not found, returning to Reviews Option Menu" && return
-          end
-          target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
+            if Movie.all.map(&:title).include?(temp_target_movie)
+                  target_movie = temp_target_movie
+                else
+                    puts "Movie not found, returning to Reviews Option Menu" && return
+                  end
+                  target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
+                    i.in '1-5'
+                    i.messages[:range?] = '%{value} out of expected range #{in}'
+                  end
+                  target_comment = @prompt.ask("Any additional comment?")
+                  @user.review_movie(target_movie, target_rating, target_comment)
+                  puts "Rewiews submitted"
+                  @user = User.find_or_create_by(name: @user.name)
+              show_menu_options_review
+              elsif choice == "Browse my reviews"
+                user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
+                if user_reviews.size > 0
+                  puts user_reviews
+                  else
+                    puts "You have not reviewed anything. Get your opinion out there!" && return
+                  end
+        elsif choice == "Delete an existing review"
+          user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
+          if user_reviews.size > 0
+          movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
+            @user.delete_review(movie_name)
+          puts "You deleted the review of #{movie_name}"
+        else
+          puts "No review to delete"
+        end
+
+    elsif choice == "Update an existing review"
+          user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
+
+          if user_reviews.size > 0
+          movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
+          new_review = @prompt.ask("Type a new review for the movie: #{movie_name}")
+          new_rating = @prompt.ask('Leave a new rating (1-5) ') do |i|
             i.in '1-5'
             i.messages[:range?] = '%{value} out of expected range #{in}'
           end
-          target_comment = @prompt.ask("Any additional comment?")
-          @user.review_movie(target_movie, target_rating, target_comment)
-          puts "Rewiews submitted"
-          @user = User.find_or_create_by(name: @user.name)
-          show_menu_options_review
-        elsif choice == "Browse my reviews"
-          user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
-          if user_reviews.size > 0
-            puts user_reviews
-          else
-            puts "You have not reviewed anything. Get your opinion out there!"
-          end
-          reviews_operations
+            @user.update_review(movie_name, new_rating, new_review)
+          puts "You successfully update the review of #{movie_name}"
+        else
+          puts "No review to update"
+        end
+
         elsif choice == "Return to main menu"
-          return
+           return
         end
       end
 
