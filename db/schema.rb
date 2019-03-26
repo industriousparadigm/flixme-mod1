@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 2019_03_25_173351) do
   create_table "movies", force: :cascade do |t|
     t.string "title"
     t.integer "release_year"
-    t.float "global_rating"
+    t.float "metacritic_rating"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
