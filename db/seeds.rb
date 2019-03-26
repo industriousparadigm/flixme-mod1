@@ -1,3 +1,8 @@
+Movie.destroy_all
+User.destroy_all
+Review.destroy_all
+Friendship.destroy_all
+
 riccardo = User.create(name: "Riccardo")
 diogo = User.create(name: "Diogo")
 manon = User.create(name: "Manon")
@@ -15,15 +20,15 @@ f5 = Friendship.create(user: sheila, friend_id: diogo.id)
 f6 = Friendship.create(user: claire, friend_id: sheila.id)
 f7 = Friendship.create(user: riccardo, friend_id: john.id)
 
-starwars = Movie.create(title: "Star Wars", release_year: 1977, global_rating: 9)
-et = Movie.create(title: "E.T.", release_year: 1982, global_rating: 9.1)
-roma = Movie.create(title: "Roma", release_year: 2018, global_rating: 9.6)
-birdman = Movie.create(title: "Birdman", release_year: 2014, global_rating: 8.8)
-veronicamars = Movie.create(title: "Veronica Mars", release_year: 2014, global_rating: 6.2)
-mammamia = Movie.create(title: "Mamma Mia!", release_year: 2008, global_rating: 5.1)
-greenbook = Movie.create(title: "Green Book", release_year: 2018, global_rating: 6.9)
-network = Movie.create(title: "Network", release_year: 1976, global_rating: 8.8)
-thebigshort = Movie.create(title: "The Big Short", release_year: 2015, global_rating: 8.1)
+starwars = Movie.create(title: "Star Wars", release_year: 1977, metacritic_rating: 9)
+et = Movie.create(title: "E.T.", release_year: 1982, metacritic_rating: 9.1)
+roma = Movie.create(title: "Roma", release_year: 2018, metacritic_rating: 9.6)
+birdman = Movie.create(title: "Birdman", release_year: 2014, metacritic_rating: 8.8)
+veronicamars = Movie.create(title: "Veronica Mars", release_year: 2014, metacritic_rating: 6.2)
+mammamia = Movie.create(title: "Mamma Mia!", release_year: 2008, metacritic_rating: 5.1)
+greenbook = Movie.create(title: "Green Book", release_year: 2018, metacritic_rating: 6.9)
+network = Movie.create(title: "Network", release_year: 1976, metacritic_rating: 8.8)
+thebigshort = Movie.create(title: "The Big Short", release_year: 2015, metacritic_rating: 8.1)
 
 riccardo.review_movie(starwars.title, 5, "what a classic!")
 diogo.review_movie(veronicamars.title, 5, "marshmallows rejoice, she is BACK")
@@ -33,3 +38,13 @@ diogo.review_movie(network.title, 4, "a bit slow but so relevant 40 years later!
 riccardo.review_movie(veronicamars.title, 2, "BOOOOORING")
 sheila.review_movie(veronicamars.title, 4, "expected better from my bestie Kristen Bell")
 pete.review_movie(veronicamars.title, 5)
+pete.review_movie("Star Wars", 4, "i prefer documentaries")
+riccardo.review_movie("Roma", 5, "this movie was dope but it has nothing to do with Italia")
+sheila.review_movie("Network", 3, "everything before 2016 is shite")
+manon.review_movie("Birdman", 5, "this was MINDBLOWING")
+john.review_movie("Birdman", 1, "self-indulgent and pretentious")
+claire.review_movie("Birdman", 5, "ed norton is so hot")
+claire.review_movie("Veronica Mars", 5, "a long time agooooo we used to be friendssssss")
+
+
+
