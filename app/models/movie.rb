@@ -17,14 +17,14 @@ class Movie < ActiveRecord::Base
         end
     end
 
-    def self.top_5_movies
+    def self.top_5_movies #Return the top 5 user ratep movies
         top5 = Movie.all.sort_by(&:average_user_rating).reverse[0..4]
         top5.map do |movie|
             "#{movie.average_user_rating} | #{movie.title} | #{movie.reviews.size} reviews."
         end
     end
 
-    def self.most_reviewed_movie
+    def self.most_reviewed_movie #Return the movie with the most reviews
         Movie.all.sort_by { |movie| movie.reviews.size }.last
     end
 end

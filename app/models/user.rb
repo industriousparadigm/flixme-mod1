@@ -9,14 +9,11 @@ class User < ActiveRecord::Base
       association_foreign_key: :friend_user_id
 
     def review_movie(movie_title, rating, comments = "")
-        if movie
+      movie = Movie.find_by title: movie_title
           Review.create(movie: movie, user: self, rating: rating, comments: comments)
-        else
-            false
-        end
     end
 
-    def self.most_active_reviewer
+    def self.most_active_reviewer #Return the user with most reviews
         User.all.sort_by do |user|
             user.reviews.size
         end.last
