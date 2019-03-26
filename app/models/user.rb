@@ -13,6 +13,15 @@ class User < ActiveRecord::Base
         Review.create(movie: movie, user: self, rating: rating, comments: comments)
     end
 
+    def delete_review(movie_title)
+        self.reviews.find { |reviews| review.movie.title == movie_title }.destroy
+    end
+
+    def update_review(movie_title, new_rating, new_comments = "")
+        target_id = self.reviews.find { |review| review.movie.title == movie_title }.id
+        Review.find(target_id).update_attributes(rating: new_rating, comments: new_comments)
+    end
+
     def self.most_active_reviewer #Return the user with most reviews
         winner = User.all.sort_by do |user|
             user.reviews.size
