@@ -8,6 +8,7 @@ class CLI
     def logo
       logo = Artii::Base.new :font => 'slant'
       puts logo.asciify("F L I X-M E")
+      `say "Welcome to flix me"`
     end
 
     def get_users_name
@@ -17,15 +18,17 @@ class CLI
 
     def welcome
       puts "Welcome #{@user.name}!"
+        `say "Welcome to flix me! #{@user.name}"`
     end
 
 
     def show_menu
     choice = " "
     while choice
-    choice = @prompt.select("What would you like to do?", ["Access my FriendList", "Broswe my Reviews", "Add a new Review", "Exit Flix-Me"])
+    choice = @prompt.select("What would you like to do?", ["Access my FriendList", "Broswe my Reviews", "Exit Flix-Me"])
       case choice
         when "Exit Flix-Me"
+        `say "Thank you for using Flix me"`
         break
       when "Access my FriendList"
          friend_list_operations
@@ -37,7 +40,7 @@ class CLI
 
 
     def friend_list_operations
-      choice = @prompt.select("Select one of the following:", ["", "Show my FriendList", "Browse FriendList", "Add new Friend"])
+      choice = @prompt.select("Select one of the following:", ["Show my FriendList", "Add new Friend"])
         if choice == "Add new Friend"
             target_friend = @prompt.ask("Who would you like to add")
             @user.add_friend_by_name(target_friend)
@@ -49,19 +52,24 @@ class CLI
       end
 
       def reviews_operations
-        choice = @prompt.select("Select one of the following:", ["", "Browse my reviews", "Add new Review"])
+        choice = @prompt.select("Select one of the following:", ["Browse my reviews", "Add new Review"])
         if choice == "Add new Review"
-            target_movie = @prompt.ask("What movie would you like to review?")
-            target_rating = @prompt.ask("How much would you like to rate it from 1 to 5 stars")
-            target_comment = @prompt.ask("Any additional comment?")
-            result = @user.review_movie(target_movie, target_rating, target_comment)
-              if !result
-              puts "NO such title, try again"
-              reviews_operations
+            temp_target_movie = @prompt.ask("What movie would you like to review?")
+            if Movie.all.map(&:title).include?(temp_target_movie)
+              target_movie = temp_target_movie
             else
+              puts "Movie not found, returning to Reviews Option Menu"
+              return
+            end
+          target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
+                i.in '1-5'
+                i.messages[:range?] = '%{value} out of expected range #{in}'
+              end
+            target_comment = @prompt.ask("Any additional comment?")
+            @user.review_movie(target_movie, target_rating, target_comment)
               puts "Rewiews submitted"
+              @user = User.find_or_create_by(name: @user.name)
             show_menu_options_review
-          end
           elsif choice == "Browse my reviews"
             puts @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
             puts ""
@@ -69,7 +77,7 @@ class CLI
         end
 
     def show_menu_options_review
-      choice = @prompt.select("",["Continue to access my Reviews.", "Go back to main_menu."])
+      choice = @prompt.select("Select one of the following:",["Continue to access my Reviews.", "Go back to main_menu."])
       if choice == "Go back to main_menu."
         show_menu
       elsif choice == "Continue to access my Reviews."
