@@ -1,46 +1,152 @@
 
 class CLI
 
-  def initialize
-    @prompt = TTY::Prompt.new
-  end
-
-  def get_users_name
-    name = @prompt.ask("What's your username?")
-    @user = User.find_or_create_by(name: name)
-  end
-
-  def welcome
-    puts "Welcome #{@user.name}!"
-  end
-
-    def show_menu
-      choice = @prompt.select("What would you like to do", ["Broswe Most Viewed Movies?", "Browse FriendList", "Add new Friend"])
-        if choice == "Add new Friend"
-          add_friend
-        elsif choice == "Broswe Most Viewed Movies?"
-          #show most viewed movies
-        elsif choice == "Browse FriendList"
-          show_their_friends
-        end
+    def initialize
+      @prompt = TTY::Prompt.new
     end
 
-  def show_their_friends
-    puts "Heres your friend list"
-    puts @user.friends.map(&:name)
-  end
+    def logo
+      logo = Artii::Base.new :font => 'slant'
+      puts logo.asciify("F L I X-M E")
+      `say "Welcome to flix me"`
+    end
 
-  def add_friend
-    @prompt.select("Here's a list of all current users, please select who you woud like to befriend", Artist.all_names) #MAybe multiple choices?
-  end
+    def get_users_name
+      name = @prompt.ask("What's your username?")
+      @user = User.find_or_create_by(name: name)
+    end
 
-  def start
-    puts "FLIXME WELCOME MAT"
-    get_users_name
-    welcome
-    show_menu
-      puts "Ok, bye!"
-  end
+    def welcome
+            puts ""
+      puts "Welcome #{@user.name}!"
+        `say "Welcome to flix me! #{@user.name}"`
+    end
+
+
+    def show_menu
+            puts ""
+    choice = " "
+    while choice
+    choice = @prompt.select("What would you like to do?", ["FriendList", "Reviews", "Fun Facts", "Exit Flix-Me"])
+      case choice
+        when "Exit Flix-Me"
+        `say "Thank you for using Flix me"`
+        return
+      when "FriendList"
+         friend_list_operations
+       when "Reviews"
+          reviews_operations
+       when"Fun Facts"
+          fun_facts
+      end
+    end
+   end
+
+
+    def friend_list_operations
+            puts ""
+      choice = @prompt.select("Select one of the following:", ["Show my FriendList", "Add new Friend"])
+        if choice == "Add new Friend"
+            temp_target_friend = @prompt.ask("Who would you like to add").strip
+            if temp_target_friend == @user.name
+            puts "User trying to add himself as friend, FOREVER ALONE DETECTED, COMMENCING SHUTDOWN"
+            elsif User.all.map(&:name).include?(temp_target_friend.to_s)
+            @user.add_friend_by_name(temp_target_friend)
+            puts "#{@user.name} and #{temp_target_friend} are now friends!"
+          else
+            puts "User not found, return to FriendList menu"
+              friend_list_operations
+            end
+          elsif choice == "Show my FriendList"
+              show_their_friends
+              show_menu_options_friend
+            end
+      end
+
+      def reviews_operations
+              puts ""
+        choice = @prompt.select("Select one of the following:", ["Browse my reviews", "Add new Review", "Return to main menu"])
+        if choice == "Add new Review"
+            temp_target_movie = @prompt.ask("What movie would you like to review?").strip
+            if Movie.all.map(&:title).include?(temp_target_movie)
+              target_movie = temp_target_movie
+            else
+              puts "Movie not found, returning to Reviews Option Menu"
+              return
+            end
+          target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
+                i.in '1-5'
+                i.messages[:range?] = '%{value} out of expected range #{in}'
+              end
+            target_comment = @prompt.ask("Any additional comment?")
+            @user.review_movie(target_movie, target_rating, target_comment)
+              puts "Rewiews submitted"
+              @user = User.find_or_create_by(name: @user.name)
+            show_menu_options_review
+          elsif choice == "Browse my reviews"
+            user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
+            if user_reviews.size > 0
+              puts user_reviews
+            else
+              puts "You have not reviewed anything. Get your opinion out there!"
+            end
+            reviews_operations
+          elsif choice == "Return to main menu"
+            show_menu
+        end
+
+        end
+
+    def show_menu_options_review
+            puts ""
+      choice = @prompt.select("Select one of the following:",["Continue to access my Reviews.", "Go back to main_menu."])
+      if choice == "Go back to main_menu."
+        show_menu
+      elsif choice == "Continue to access my Reviews."
+        reviews_operations
+      end
+    end
+
+    def show_menu_options_friend
+            puts ""
+      choice = @prompt.select("",["Continue to access my FriendList.", "Go back to main_menu."])
+      if choice == "Go back to main_menu."
+        show_menu
+      elsif choice == "Continue to access my FriendList."
+        friend_list_operations
+      end
+    end
+
+    def show_their_friends
+            puts ""
+      puts "Heres your friend list:"
+      puts @user.friends.map(&:name)
+    end
+
+    def start
+      logo
+      get_users_name
+      welcome
+      show_menu
+    end
+
+    def fun_facts
+            puts ""
+      choice = @prompt.select("Select one of the following:", ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"])
+      if choice == "Most reviewed movie"
+      puts Movie.most_reviewed_movie.title
+        fun_facts
+      elsif choice == "Find the top 5 movies"
+        puts Movie.top_5_movies
+        fun_facts
+      elsif choice == "Most active reviewer"
+      puts User.most_active_reviewer
+        fun_facts
+      elsif choice == "Back to main menu"
+        show_menu
+      end
+    end
+
 
 end
 # require 'TTY'
