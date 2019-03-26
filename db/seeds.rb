@@ -3,7 +3,7 @@ diogo = User.create(name: "Diogo")
 manon = User.create(name: "Manon")
 john = User.create(name: "John")
 claire = User.create(name: "Claire")
-sheila = User.create(name: "sheila")
+sheila = User.create(name: "Sheila")
 jack = User.create(name: "Jack")
 pete = User.create(name: "Pete")
 

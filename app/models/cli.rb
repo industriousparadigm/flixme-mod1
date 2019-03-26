@@ -27,7 +27,7 @@ class CLI
 
   def show_their_friends
     puts "Heres your friend list"
-    @user.friends
+    puts @user.friends.map(&:name)
   end
 
   def add_friend
