@@ -8,8 +8,13 @@ class User < ActiveRecord::Base
       foreign_key: :user_id,
       association_foreign_key: :friend_user_id
 
-    def review_movie(movie, rating, comments = "")
-        Review.create(movie: movie, user: self, rating: rating, comments: comments)
+    def review_movie(movie_title, rating, comments = "")
+        movie = find_by(name: movie_title)
+        if movie
+            Review.create(movie: movie, user: self, rating: rating, comments: comments)
+        else
+            false
+        end
     end
 
     def add_friend(user)
