@@ -10,7 +10,8 @@ require 'sinatra/activerecord/rake'
     task :run do
       cli = CLI.new
       cli.start
+
+      binding.pry
+      9
+
     end
-    # 
-    # binding.pry
-    # 9

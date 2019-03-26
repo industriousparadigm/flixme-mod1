@@ -1,3 +1,4 @@
+require_all 'app'
 
 class CLI
 
@@ -5,13 +6,18 @@ class CLI
     @prompt = TTY::Prompt.new
   end
 
+  def my_id(name)
+    temp = User.find_by name: name
+    temp.id
+  end
+
   def get_users_name
     name = @prompt.ask("What's your username?")
-    @user = User.find_or_create_by(name: name)
+    @user = name
   end
 
   def welcome
-    puts "Welcome #{@user.name}!"
+    puts "Welcome #{@user}!"
   end
 
     def show_menu
@@ -27,7 +33,9 @@ class CLI
 
   def show_their_friends
     puts "Heres your friend list"
-    @user.friends
+    id = my_id(@user)
+    puts User.find(id).friends.map(&:name)
+
   end
 
   def add_friend
