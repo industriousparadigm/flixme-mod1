@@ -7,6 +7,18 @@ class User < ActiveRecord::Base
       join_table:  :friendships,
       foreign_key: :user_id,
       association_foreign_key: :friend_user_id
+
+    def add_friend(user)
+        Friendship.create(user_id: self.id, friend_id: user.id)
+    end
+
+    def add_friend_by_name(name)
+        Friendship.create(user_id: self.id, friend_id: User.find_by(name: name).id)
+    end
+
+    def delete_friend(user)
+        #
+    end
   
     def friendships
         all_friendships = Friendship.all.select do |friendship|
