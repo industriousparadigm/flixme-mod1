@@ -23,32 +23,61 @@ class CLI
     def show_menu
     choice = " "
     while choice
-    choice = @prompt.select("What would you like to do?", ["Access my FriendList", "Broswe my Reviews", "Exit Flix-Me"])
+    choice = @prompt.select("What would you like to do?", ["Access my FriendList", "Broswe my Reviews", "Add a new Review", "Exit Flix-Me"])
       case choice
         when "Exit Flix-Me"
         break
       when "Access my FriendList"
          friend_list_operations
         when "Broswe my Reviews"
-          puts @user.reviews.map{|i| [Movie.find(i.movie_id).title, i.rating, i.comments]}
+          reviews_operations
       end
     end
    end
 
 
     def friend_list_operations
-      choice = @prompt.select("Select one of the following:", ["Show my FriendList", "Browse FriendList", "Add new Friend"])
+      choice = @prompt.select("Select one of the following:", ["", "Show my FriendList", "Browse FriendList", "Add new Friend"])
         if choice == "Add new Friend"
             target_friend = @prompt.ask("Who would you like to add")
             @user.add_friend_by_name(target_friend)
-            show_menu_options
+            show_menu_options_friend
           elsif choice == "Show my FriendList"
               show_their_friends
-              show_menu_options
+              show_menu_options_friend
             end
       end
 
-    def show_menu_options
+      def reviews_operations
+        choice = @prompt.select("Select one of the following:", ["", "Browse my reviews", "Add new Review"])
+        if choice == "Add new Review"
+            target_movie = @prompt.ask("What movie would you like to review?")
+            target_rating = @prompt.ask("How much would you like to rate it from 1 to 5 stars")
+            target_comment = @prompt.ask("Any additional comment?")
+            result = @user.review_movie(target_movie, target_rating, target_comment)
+              if !result
+              puts "NO such title, try again"
+              reviews_operations
+            else
+              puts "Rewiews submitted"
+            show_menu_options_review
+          end
+          elsif choice == "Browse my reviews"
+            puts @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
+            puts ""
+          end
+        end
+
+    def show_menu_options_review
+      choice = @prompt.select("",["Continue to access my Reviews.", "Go back to main_menu."])
+      if choice == "Go back to main_menu."
+        show_menu
+      elsif choice == "Continue to access my Reviews."
+        reviews_operations
+      end
+    end
+
+    def show_menu_options_friend
       choice = @prompt.select("",["Continue to access my FriendList.", "Go back to main_menu."])
       if choice == "Go back to main_menu."
         show_menu
@@ -60,9 +89,6 @@ class CLI
     def show_their_friends
       puts "Heres your friend list:"
       puts @user.friends.map(&:name)
-    end
-
-    def target_friend
     end
 
     def start
