@@ -6,17 +6,19 @@ class User < ActiveRecord::Base
       class_name: "User",
       join_table:  :friendships,
       foreign_key: :user_id,
-      association_foreign_key: :friend_user_id
+      association_foreign_key: :friend_id
 
     def review_movie(movie_title, rating, comments = "")
-      movie = Movie.find_by title: movie_title
-          Review.create(movie: movie, user: self, rating: rating, comments: comments)
+        movie = Movie.find_by title: movie_title
+        Review.create(movie: movie, user: self, rating: rating, comments: comments)
     end
 
     def self.most_active_reviewer #Return the user with most reviews
-        User.all.sort_by do |user|
+        winner = User.all.sort_by do |user|
             user.reviews.size
         end.last
+
+        "#{winner.name} with #{winner.reviews.size} reviews!"
     end
 
     def add_friend(user)
@@ -32,7 +34,14 @@ class User < ActiveRecord::Base
     end
 
     def delete_friend(user)
-        #
+        self.friendships.find do |friendship|
+            (friendship.user_id == self.id && friendship.friend_id == user.id) ||
+            (friendship.user_id == user.id && friendship.friend_id == self.id)
+        end.destroy
+    end
+
+    def delete_friend_by_name(name)
+        delete_friend(User.find_by(name: name))
     end
 
     def friendships

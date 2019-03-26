@@ -145,7 +145,7 @@ class CLI
         puts Movie.top_5_movies
         fun_facts
       elsif choice == "Most active reviewer"
-      puts User.most_active_reviewer.name
+      puts User.most_active_reviewer
         fun_facts
       elsif choice == "Back to main menu"
         return
