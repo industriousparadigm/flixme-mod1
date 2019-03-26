@@ -5,6 +5,11 @@ class CLI
     @prompt = TTY::Prompt.new
   end
 
+  def logo
+    logo = Artii::Base.new :font => 'slant'
+    puts logo.asciify("F L I X-M E")
+end
+
   def get_users_name
     name = @prompt.ask("What's your username?")
     @user = User.find_or_create_by(name: name)
@@ -17,11 +22,15 @@ class CLI
     def show_menu
       choice = @prompt.select("What would you like to do", ["Broswe Most Viewed Movies?", "Browse FriendList", "Add new Friend"])
         if choice == "Add new Friend"
-          add_friend
+          target_friend = @prompt.ask("Who would you like to add")
+          add_friend_by_name(target_friend)
+          show_menu
         elsif choice == "Broswe Most Viewed Movies?"
           #show most viewed movies
         elsif choice == "Browse FriendList"
           show_their_friends
+          sleep(3)
+          show_menu
         end
     end
 
@@ -30,16 +39,16 @@ class CLI
     puts @user.friends.map(&:name)
   end
 
-  def add_friend
-    @prompt.select("Here's a list of all current users, please select who you woud like to befriend", Artist.all_names) #MAybe multiple choices?
+  def target_friend
+
   end
 
   def start
-    puts "FLIXME WELCOME MAT"
+    logo
     get_users_name
     welcome
     show_menu
-      puts "Ok, bye!"
+    puts "Ok, bye!"
   end
 
 end
