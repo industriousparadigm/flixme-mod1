@@ -104,6 +104,7 @@ class CLI
           if user_reviews.size > 0
           movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
             @user.delete_review(movie_name)
+            @user = User.find_or_create_by(name: @user.name)
           puts "You deleted the review of #{movie_name}"
         else
           puts "No review to delete"
@@ -120,6 +121,7 @@ class CLI
             i.messages[:range?] = '%{value} out of expected range #{in}'
           end
             @user.update_review(movie_name, new_rating, new_review)
+            @user = User.find_or_create_by(name: @user.name)
           puts "You successfully update the review of #{movie_name}"
         else
           puts "No review to update"

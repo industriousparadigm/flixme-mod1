@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
     end
 
     def delete_review(movie_title)
-        self.reviews.find { |reviews| review.movie.title == movie_title }.destroy
+        self.reviews.find { |review| review.movie.title == movie_title }.destroy
     end
 
     def update_review(movie_title, new_rating, new_comments = "")
