@@ -1,10 +1,10 @@
 class CLI
-  MAIN_MENU= ["Rate a Movie", "Recomend a Movie", "Friends", "Reviews", "Fun Facts", "Exit Flix-Me"]
+  MAIN_MENU= ["Rate a Movie", "Get a movie recommendation", "Friends", "Reviews", "Fun Facts", "Exit Flix-Me"]
   REVIEW_OPTIONS = ["Browse my reviews", "Add new Review", "Update an existing review", "Delete an existing review", "Return to main menu"]
   FRIENDLIST_OPTIONS = ["Show my FriendList", "Show friend reviews", "Add new Friend", "Delete Friend", "Back to main menu"]
   FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
-  RECOMEND_MENU = ["Just for me", "With friends"]
-#MENUS AND SUBMENUS COSTANTS ARRAYS
+  RECOMMEND_MENU = ["Just for me", "With friends"]
+  #MENUS AND SUBMENUS COSTANTS ARRAYS
   def initialize
     @prompt = TTY::Prompt.new
   end
@@ -16,7 +16,7 @@ class CLI
 
   def get_users_name
     name = @prompt.ask("What's your username?")
-    @user = User.find_or_create_by(name: name)
+    @user = User.find_or_create_by(name: name.strip.downcase.capitalize)
   end
 
   def welcome
@@ -26,6 +26,7 @@ class CLI
 
 
   def show_menu
+    puts ""
     while true
       choice = @prompt.select("What would you like to do?", MAIN_MENU)
       puts ""
@@ -38,27 +39,29 @@ class CLI
         reviews_operations
       when "Rate a Movie"
         add_new_review
-      when "Get a movie recommendedation"
-        recomend_a_movie
+      when "Get a movie recommendation"
+        recommend_a_movie
       when "Fun Facts"
         fun_facts
       end
     end
   end
 
-  def recomend_a_movie
-    choice = @prompt.select("Who's watching?", RECOMEND_MENU)
+  def recommend_a_movie
+    puts ""
+    choice = @prompt.select("Who's watching?", RECOMMEND_MENU)
     puts ""
     case choice
     when "Just for me"
-    puts  @user.get_recommendation
+      puts  @user.get_recommendations
     when "With friends"
-    friends_array = @prompt.multi_select("Select one or more of your friends:",  @user.friends.map(&:name))
-    puts @user.get_recommendation(friends_array)
+      friends_array = @prompt.multi_select("Select one or more of your friends:",  @user.friends.map(&:name))
+      puts @user.get_recommendations(friends_array)
     end
   end
 
   def reviews_operations
+    puts ""
     while true
       choice = @prompt.select("Select one of the following:", REVIEW_OPTIONS)
       puts ""
@@ -107,8 +110,7 @@ class CLI
     movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
     @user.delete_review(movie_name)
     # @user = User.find_or_create_by(name: @user.name) #MAGIC!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    puts "You deleted the review of #{movie_name}"
-    reviews_operations #refracted
+    puts "You deleted the review of #{movie_name}" #refracted
   end
 
   def browser_user_reviews
@@ -121,7 +123,8 @@ class CLI
   end
 
   def add_new_review
-    temp_target_movie = @prompt.ask("What movie would you like to review?").strip
+    puts ""
+    temp_target_movie = @prompt.ask("What movie would you like to review?").strip.split.map{|i| i.downcase.capitalize}.join(" ")
     if Movie.all.map(&:title).include?(temp_target_movie)
       if !@user.reviews.map{ |i| i.movie.title }.include?(temp_target_movie)
         target_movie = temp_target_movie
@@ -131,10 +134,10 @@ class CLI
       end
       target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
         i.in '1-5'
-        i.messages[:range?] = '%{value} out of expected range #{in}'
+        i.messages[:range?] = 'You cannot vote %{value}'
       end
-
       target_comment = @prompt.ask("Any additional comment?")
+
       @user.review_movie(target_movie, target_rating, target_comment)
       puts "Rewiews submitted"
       @user = User.find_or_create_by(name: @user.name)
@@ -144,6 +147,7 @@ class CLI
   end
 
   def friend_list_operations
+    puts ""
     while true
       puts ""
       choice = @prompt.select("Select one of the following:", FRIENDLIST_OPTIONS)
@@ -163,29 +167,31 @@ class CLI
   end
 
   def friend_reviews
-  temp_target_friend = @prompt.select("Select one of your friends:",  @user.friends.map(&:name))
-  puts "", "#{temp_target_friend} has the following reviews:"
-  puts User.find_by(name: temp_target_friend).reviews.map{|i| ["",Movie.find(i.movie_id).title, "With the rating of: #{i.rating}", i.comments]}
+    puts ""
+    temp_target_friend = @prompt.select("Select one of your friends:",  @user.friends.map(&:name))
+    puts "", "#{temp_target_friend} has the following reviews:"
+    puts User.find_by(name: temp_target_friend).reviews.map{|i| ["",Movie.find(i.movie_id).title, "With the rating of: #{i.rating}", i.comments]}
   end
 
   def delete_friend
-      temp_target_friend = @prompt.ask("Who you want to delete from your Friendlist?").strip
-      check = @user.friends.map(&:name).include?(temp_target_friend.to_s)
-      if check
-        @user.delete_friend_by_name(temp_target_friend)
-        puts ""
-        puts "You and #{temp_target_friend} are no longer friends..."
-      else
-        puts ""
-        puts "You and #{temp_target_friend} are not friend. AT ALL"
-      end
+    temp_target_friend = @prompt.ask("Who you want to delete from your Friendlist?").strip.split.map{|i| i.downcase.capitalize}.join(" ")
+    check = @user.friends.map(&:name).include?(temp_target_friend)
+    if check
+      @user.delete_friend_by_name(temp_target_friend)
+      puts ""
+      puts "You and #{temp_target_friend} are no longer friends..."
+    else
+      puts ""
+      puts "You and #{temp_target_friend} are not friend. AT ALL"
+    end
   end
 
   def add_new_friend
-    temp_target_friend = @prompt.ask("Who would you like to add").strip
+    puts ""
+    temp_target_friend = @prompt.ask("Who would you like to add").strip.split.map{|i| i.downcase.capitalize}.join(" ")
     if temp_target_friend == @user.name
       puts "User trying to add himself as friend, FOREVER ALONE DETECTED, COMMENCING SHUTDOWN"
-    elsif User.all.map(&:name).include?(temp_target_friend.to_s)
+    elsif User.all.map(&:name).include?(temp_target_friend)
       @user.add_friend_by_name(temp_target_friend)
       puts "#{@user.name} and #{temp_target_friend} are now friends!"
     else
@@ -201,7 +207,7 @@ class CLI
 
   def start
     # logo
-     get_users_name
+    get_users_name
     welcome
     show_menu
   end

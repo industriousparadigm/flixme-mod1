@@ -12,7 +12,7 @@ class Movie < ActiveRecord::Base
             Movie.find_or_create_by(
                 title: movie_hash["title"],
                 release_year: movie_hash["release_date"][0..3].to_i,
-                tmdb_rating: movie_hash["vote_average"].to_f
+                tmdb_rating: movie_hash["vote_average"].to_f / 2
             )
         end
     end

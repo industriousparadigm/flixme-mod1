@@ -11,6 +11,3 @@ require 'sinatra/activerecord/rake'
       cli = CLI.new
       cli.start
     end
-    # 
-    # binding.pry
-    # 9
