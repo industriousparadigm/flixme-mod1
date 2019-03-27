@@ -78,7 +78,8 @@ class CLI
           if Movie.all.map(&:title).include?(temp_target_movie)
             target_movie = temp_target_movie
           else
-            puts "Movie not found, returning to Reviews Option Menu" && return
+            puts "Movie not found, returning to Reviews Option Menu"
+            return
           end
           target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
             i.in '1-5'
