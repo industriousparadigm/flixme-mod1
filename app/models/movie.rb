@@ -25,6 +25,7 @@ class Movie < ActiveRecord::Base
     end
 
     def self.most_reviewed_movie #Return the movie with the most reviews
-        Movie.all.sort_by { |movie| movie.reviews.size }.last
+        result = Movie.all.sort_by { |movie| movie.reviews.size }.last
+        # "#{result.title} is the most popular movie with #{result.reviews.size} reviews!"
     end
 end

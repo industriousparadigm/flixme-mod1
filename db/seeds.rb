@@ -11,6 +11,8 @@ claire = User.create(name: "Claire")
 sheila = User.create(name: "Sheila")
 jack = User.create(name: "Jack")
 pete = User.create(name: "Pete")
+mariana = User.create(name: "Mariana")
+diana = User.create(name: "Diana")
 
 f1 = Friendship.create(user: riccardo, friend_id: diogo.id)
 f2 = Friendship.create(user: diogo, friend_id: pete.id)
@@ -19,6 +21,8 @@ f4 = Friendship.create(user: sheila, friend_id: riccardo.id)
 f5 = Friendship.create(user: sheila, friend_id: diogo.id)
 f6 = Friendship.create(user: claire, friend_id: sheila.id)
 f7 = Friendship.create(user: riccardo, friend_id: john.id)
+f8 = Friendship.create(user: mariana, friend_id: diogo.id)
+f9 = Friendship.create(user: diana, friend_id: mariana.id)
 
 starwars = Movie.create(title: "Star Wars", release_year: 1977, metacritic_rating: 9)
 et = Movie.create(title: "E.T.", release_year: 1982, metacritic_rating: 9.1)
@@ -29,6 +33,8 @@ mammamia = Movie.create(title: "Mamma Mia!", release_year: 2008, metacritic_rati
 greenbook = Movie.create(title: "Green Book", release_year: 2018, metacritic_rating: 6.9)
 network = Movie.create(title: "Network", release_year: 1976, metacritic_rating: 8.8)
 thebigshort = Movie.create(title: "The Big Short", release_year: 2015, metacritic_rating: 8.1)
+moana = Movie.create(title: "Moana", release_year: 2016, metacritic_rating: 8.1)
+peppa = Movie.create(title: "Peppa The Pig", release_year: 2019, metacritic_rating: 4)
 
 riccardo.review_movie(starwars.title, 5, "what a classic!")
 diogo.review_movie(veronicamars.title, 5, "marshmallows rejoice, she is BACK")
@@ -45,6 +51,5 @@ manon.review_movie("Birdman", 5, "this was MINDBLOWING")
 john.review_movie("Birdman", 1, "self-indulgent and pretentious")
 claire.review_movie("Birdman", 5, "ed norton is so hot")
 claire.review_movie("Veronica Mars", 5, "a long time agooooo we used to be friendssssss")
-
-
-
+mariana.review_movie("Birdman", 5, "very good camerawork and brilliantly acted. so good!")
+diana.review_movie("Moana", 5, "Mama! nana")
