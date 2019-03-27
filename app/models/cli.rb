@@ -229,7 +229,7 @@ class CLI
     puts ""
     choice = @prompt.select("Select one of the following:", FUN_FACTS)
     if choice == "Most reviewed movie"
-      puts Movie.most_reviewed_movie.title
+      puts Movie.most_reviewed_movie
     elsif choice == "Find the top 5 movies"
       puts Movie.top_5_movies
     elsif choice == "Most active reviewer"
