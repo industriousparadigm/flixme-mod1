@@ -1,6 +1,12 @@
 
 class CLI
 
+    REVIEW_OPTIONS = ["Browse my reviews", "Add new Review", "Return to main menu", "Delete an existing review", "Update an existing review"]
+    FRIENDLIST_OPTIONS = ["Show my FriendList", "Add new Friend", "Delete Friend"]
+    REWIEW_SUBMENU = ["Continue to access my Reviews.", "Go back to main_menu."]
+    FRIENDLIST_SUBMENU =["Continue to access my FriendList.", "Go back to main_menu."]
+    FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
+
     def initialize
       @prompt = TTY::Prompt.new
     end
@@ -8,7 +14,6 @@ class CLI
     def logo
       logo = Artii::Base.new :font => 'slant'
       puts logo.asciify("F L I X-M E")
-      `say "Welcome to flix me"`
     end
 
     def get_users_name
@@ -19,7 +24,6 @@ class CLI
     def welcome
       puts ""
       puts "Welcome #{@user.name}!"
-        `say "Welcome to flix me! #{@user.name}"`
     end
 
 
@@ -28,9 +32,9 @@ class CLI
       choice = " "
       while choice
       choice = @prompt.select("What would you like to do?", ["FriendList", "Reviews", "Fun Facts", "Exit Flix-Me"])
+      puts ""
         case choice
           when "Exit Flix-Me"
-            `say "Thank you for using Flix me"`
             return
           when "FriendList"
             friend_list_operations
@@ -44,7 +48,8 @@ class CLI
 
     def friend_list_operations
         puts ""
-      choice = @prompt.select("Select one of the following:", ["Show my FriendList", "Add new Friend", "Delete Friend"])
+      choice = @prompt.select("Select one of the following:", FRIENDLIST_OPTIONS)
+      puts ""
         if choice == "Add new Friend"
             temp_target_friend = @prompt.ask("Who would you like to add").strip
             if temp_target_friend == @user.name
@@ -75,87 +80,107 @@ class CLI
 
       def reviews_operations
         puts ""
-        choice = @prompt.select("Select one of the following:", ["Browse my reviews", "Add new Review", "Return to main menu", "Delete an existing review", "Update an existing review"])
-        if choice == "Add new Review"
-          temp_target_movie = @prompt.ask("What movie would you like to review?").strip
-            if Movie.all.map(&:title).include?(temp_target_movie)
-                  target_movie = temp_target_movie
-                else
-                    puts "Movie not found, returning to Reviews Option Menu" && return
-                  end
-                  target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
-                    i.in '1-5'
-                    i.messages[:range?] = '%{value} out of expected range #{in}'
-                  end
-                  target_comment = @prompt.ask("Any additional comment?")
-                  @user.review_movie(target_movie, target_rating, target_comment)
-                  puts "Rewiews submitted"
-                  @user = User.find_or_create_by(name: @user.name)
-              show_menu_options_review
+        choice = @prompt.select("Select one of the following:", REVIEW_OPTIONS)
+        puts ""
+              if choice == "Add new Review"
+              add_new_review
               elsif choice == "Browse my reviews"
-                user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
-                if user_reviews.size > 0
-                  puts user_reviews
-                  else
-                    puts "You have not reviewed anything. Get your opinion out there!" && return
-                  end
-        elsif choice == "Delete an existing review"
-          user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
-          if user_reviews.size > 0
-          movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
-            @user.delete_review(movie_name)
-            @user = User.find_or_create_by(name: @user.name)
-          puts "You deleted the review of #{movie_name}"
-        else
-          puts "No review to delete"
-        end
+              browser_user_reviews
+              elsif choice == "Delete an existing review"
+              user_reviews = get_reviews
+              if user_reviews.size > 0
+              delete_review
+              else
+              puts "No review to delete"
+              end
 
-    elsif choice == "Update an existing review"
-          user_reviews = @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]}
-
-          if user_reviews.size > 0
-          movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
-          new_review = @prompt.ask("Type a new review for the movie: #{movie_name}")
-          new_rating = @prompt.ask('Leave a new rating (1-5) ') do |i|
-            i.in '1-5'
-            i.messages[:range?] = '%{value} out of expected range #{in}'
-          end
-            @user.update_review(movie_name, new_rating, new_review)
-            @user = User.find_or_create_by(name: @user.name)
-          puts "You successfully update the review of #{movie_name}"
-        else
-          puts "No review to update"
-        end
-
-        elsif choice == "Return to main menu"
-           return
-        end
+              elsif choice == "Update an existing review"
+              user_reviews = get_reviews
+              if user_reviews.size > 0
+              else
+              puts "No review to update"
+              end
+              elsif choice == "Return to main menu"
+              return
+            end #refracted
       end
+
+    def get_reviews
+      @user.reviews.map{|i| ["",Movie.find(i.movie_id).title, "You have rated it:#{i.rating}", i.comments]} #refracted
+    end
+
+    def delete_review
+      movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
+        @user.delete_review(movie_name)
+        @user = User.find_or_create_by(name: @user.name)
+      puts "You deleted the review of #{movie_name}"
+      reviews_operations #refracted
+    end
+
+    def browser_user_reviews
+      user_reviews = get_reviews
+      if user_reviews.size > 0
+        puts user_reviews
+        else
+          puts "You have not reviewed anything. Get your opinion out there!"
+          reviews_operations
+        end #refracted #refracted
+    end
+
+    def add_new_review
+      temp_target_movie = @prompt.ask("What movie would you like to review?").strip
+        if Movie.all.map(&:title).include?(temp_target_movie)
+              target_movie = temp_target_movie
+            else
+                puts "Movie not found, returning to Reviews Option Menu" && return
+              end
+              target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
+                i.in '1-5'
+                i.messages[:range?] = '%{value} out of expected range #{in}'
+              end
+              target_comment = @prompt.ask("Any additional comment?")
+              @user.review_movie(target_movie, target_rating, target_comment)
+              puts "Rewiews submitted"
+              @user = User.find_or_create_by(name: @user.name)
+          show_menu_options_review  #refracted #refracted #refracted
+    end
+
+    def update_existing_review
+      movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
+      new_review = @prompt.ask("Type a new review for the movie: #{movie_name}")
+      new_rating = @prompt.ask('Leave a new rating (1-5) ') do |i|
+        i.in '1-5'
+        i.messages[:range?] = '%{value} out of expected range #{in}'
+        @user.update_review(movie_name, new_rating, new_review)
+        @user = User.find_or_create_by(name: @user.name)
+      puts "You successfully update the review of #{movie_name}" && reviews_operations
+      end
+    end
 
     def show_menu_options_review
             puts ""
-      choice = @prompt.select("Select one of the following:",["Continue to access my Reviews.", "Go back to main_menu."])
+      choice = @prompt.select("Select one of the following:", REWIEW_SUBMENU)
       if choice == "Go back to main_menu."
         return
       elsif choice == "Continue to access my Reviews."
         reviews_operations
-      end
+      end #refracted
     end
 
     def show_menu_options_friend
             puts ""
-      choice = @prompt.select("",["Continue to access my FriendList.", "Go back to main_menu."])
+      choice = @prompt.select("", FRIENDLIST_SUBMENU)
       if choice == "Go back to main_menu."
         return
       elsif choice == "Continue to access my FriendList."
         friend_list_operations
-      end
+      end #refracted
     end
 
     def show_their_friends
             puts ""
       puts "Heres your friend list:"
-      puts @user.friends.map(&:name)
+      puts @user.friends.map(&:name) #refracted
     end
 
     def start
@@ -167,7 +192,7 @@ class CLI
 
     def fun_facts
             puts ""
-      choice = @prompt.select("Select one of the following:", ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"])
+      choice = @prompt.select("Select one of the following:", FUN_FACTS)
       if choice == "Most reviewed movie"
       puts Movie.most_reviewed_movie.title
         fun_facts
@@ -179,9 +204,8 @@ class CLI
         fun_facts
       elsif choice == "Back to main menu"
         return
-      end
+      end  #refracted
     end
-
 
 end
 # require 'TTY'
