@@ -9,14 +9,18 @@ class CLI
     @prompt = TTY::Prompt.new
   end
 
+  def normalizer(string)
+  string.strip.split.map{|i| i.downcase.capitalize}.join(" ")
+  end
+
   def logo
-    logo = Artii::Base.new :font => 'slant'
-    puts logo.asciify("F L I X-M E")
+    puts "                                    FLIX-ME."
+    puts "                      (Not interested in cool-flashy Logos)"
   end
 
   def get_users_name
     name = @prompt.ask("What's your username?")
-    @user = User.find_or_create_by(name: name.strip.downcase.capitalize)
+    @user = User.find_or_create_by(name: normalizer(name))
   end
 
   def welcome
@@ -93,7 +97,7 @@ class CLI
   end
 
   def show_movie_reviews
-    target_title = @prompt.ask("What's the name of the movie?")
+    target_title = normalizer(@prompt.ask("What's the name of the movie?"))
     movie = Movie.find_by(title: target_title)
     if movie
       puts movie.latest_reviews
@@ -122,6 +126,7 @@ class CLI
   def delete_review
     movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
     @user.delete_review(movie_name)
+    @user = User.find_or_create_by(name: @user.name)
     # @user = User.find_or_create_by(name: @user.name) #MAGIC!!!!!!!!!!!!!!!!!!!!!!!!!!!
     puts "You deleted the review of #{movie_name}" #refracted
   end
@@ -137,7 +142,7 @@ class CLI
 
   def add_new_review
     puts ""
-    temp_target_movie = @prompt.ask("What movie would you like to review?").strip.split.map{|i| i.downcase.capitalize}.join(" ")
+    temp_target_movie = normalizer(@prompt.ask("What movie would you like to review?"))
     if Movie.all.map(&:title).include?(temp_target_movie)
       if !@user.reviews.map{ |i| i.movie.title }.include?(temp_target_movie)
         target_movie = temp_target_movie
@@ -187,7 +192,7 @@ class CLI
   end
 
   def delete_friend
-    temp_target_friend = @prompt.ask("Who you want to delete from your Friendlist?").strip.split.map{|i| i.downcase.capitalize}.join(" ")
+    temp_target_friend = normalizer(@prompt.ask("Who you want to delete from your Friendlist?"))
     check = @user.friends.map(&:name).include?(temp_target_friend)
     if check
       @user.delete_friend_by_name(temp_target_friend)
@@ -201,7 +206,7 @@ class CLI
 
   def add_new_friend
     puts ""
-    temp_target_friend = @prompt.ask("Who would you like to add").strip.split.map{|i| i.downcase.capitalize}.join(" ")
+    temp_target_friend = normalizer(@prompt.ask("Who would you like to add"))
     if temp_target_friend == @user.name
       puts "User trying to add himself as friend, FOREVER ALONE DETECTED, COMMENCING SHUTDOWN"
     elsif User.all.map(&:name).include?(temp_target_friend)
@@ -219,7 +224,7 @@ class CLI
   end
 
   def start
-    # logo
+    logo
     get_users_name
     welcome
     show_menu
@@ -229,7 +234,7 @@ class CLI
     puts ""
     choice = @prompt.select("Select one of the following:", FUN_FACTS)
     if choice == "Most reviewed movie"
-      puts Movie.most_reviewed_movie.title
+      puts Movie.most_reviewed_movie
     elsif choice == "Find the top 5 movies"
       puts Movie.top_5_movies
     elsif choice == "Most active reviewer"
