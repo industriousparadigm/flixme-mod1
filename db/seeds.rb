@@ -33,7 +33,6 @@ roma = Movie.create(title: "Roma", release_year: 2018, tmdb_rating: 9.6)
 birdman = Movie.create(title: "Birdman", release_year: 2014, tmdb_rating: 8.8)
 veronicamars = Movie.create(title: "Veronica Mars", release_year: 2014, tmdb_rating: 6.2)
 mammamia = Movie.create(title: "Mamma Mia!", release_year: 2008, tmdb_rating: 5.1)
-greenbook = Movie.create(title: "Green Book", release_year: 2018, tmdb_rating: 6.9)
 network = Movie.create(title: "Network", release_year: 1976, tmdb_rating: 8.8)
 thebigshort = Movie.create(title: "The Big Short", release_year: 2015, tmdb_rating: 8.1)
 moana = Movie.create(title: "Moana", release_year: 2016, tmdb_rating: 8.1)
@@ -59,4 +58,4 @@ claire.review_movie("Veronica Mars", 5, "a long time agooooo we used to be frien
 mariana.review_movie("Birdman", 5, "very good camerawork and brilliantly acted. so good!")
 diana.review_movie("Moana", 5, "Mama! nana")
 
-Movie.get_tmdb_movies
+Movie.get_tmdb_movies(100)

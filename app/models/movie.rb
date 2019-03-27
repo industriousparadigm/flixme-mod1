@@ -20,7 +20,7 @@ class Movie < ActiveRecord::Base
             end
             
             current_page += 1
-            url = url.chop + current_page.to_s
+            url = "https://api.themoviedb.org/3/movie/top_rated?api_key=b90e3d41e6ca35ff7dbd3597740c1ca6&language=en-US&page=#{current_page.to_s}"
         end
     
     end
