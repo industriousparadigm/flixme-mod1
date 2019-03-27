@@ -1,6 +1,6 @@
 class CLI
   MAIN_MENU= ["Rate a Movie", "Get a movie recommendation", "Friends", "Reviews", "Fun Facts", "Exit Flix-Me"]
-  REVIEW_OPTIONS = ["Browse my reviews", "Add new Review", "Update an existing review", "Delete an existing review", "Return to main menu"]
+  REVIEW_OPTIONS = ["Show movie reviews", "Browse my reviews", "Add new Review", "Update an existing review", "Delete an existing review", "Return to main menu"]
   FRIENDLIST_OPTIONS = ["Show my FriendList", "Show friend reviews", "Add new Friend", "Delete Friend", "Back to main menu"]
   FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
   RECOMMEND_MENU = ["Just for me", "With friends"]
@@ -70,6 +70,8 @@ class CLI
         add_new_review
       when "Browse my reviews"
         browser_user_reviews
+      when "Show movie reviews"
+        show_movie_reviews
       when "Delete an existing review"
         user_reviews = get_reviews
         if user_reviews.size > 0
@@ -89,6 +91,17 @@ class CLI
       end
     end #refracted
   end
+
+  def show_movie_reviews
+    target_title = @prompt.ask("What's the name of the movie?")
+    movie = Movie.find_by(title: target_title)
+    if movie
+      puts movie.latest_reviews
+    else
+    puts "Movie not found."
+    end
+  end
+
 
   def update_existing_review
     movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
