@@ -24,6 +24,7 @@ GEM
       domain_name (~> 0.5)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
+    json (2.2.0)
     kramdown (1.16.2)
     method_source (0.9.2)
     mime-types (3.2.2)
@@ -165,6 +166,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   artii
+  json
   pry
   rainbow
   rake

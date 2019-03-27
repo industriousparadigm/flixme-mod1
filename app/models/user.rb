@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
 
     def get_recommendations(friend_names = [])
         # returns a list of top 10 movies that neither me nor my friends have seen
-        
+
         # first let's get a unique array of movies everyone in the group watched
         ineligible_movies = []
 
@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
         Movie.all.sort_by(&:tmdb_rating).reverse.each do |movie|
             if !ineligible_movies.include?(movie)
                 recommendations << movie
-                matches_found += 1                
+                matches_found += 1
             end
             break if matches_found >= 10
         end

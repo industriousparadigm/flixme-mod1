@@ -1,6 +1,4 @@
 
-        require 'rest-client'
-require 'json'
 Movie.destroy_all
 User.destroy_all
 Review.destroy_all
