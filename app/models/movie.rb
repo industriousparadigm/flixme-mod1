@@ -40,6 +40,18 @@ class Movie < ActiveRecord::Base
         end
     end
 
+    def latest_reviews(n = 5)  
+        n = self.reviews.size if n > self.reviews.size
+        last_n_reviews = self.reviews[-n..-1]
+        
+        last_n_reviews.map do |review|
+            "#{review.user.name} wrote:
+            #{review.comments}
+            Rating: #{review.rating} out of 5
+            "
+        end
+    end
+
     def self.top_5_movies #Return the top 5 user ratep movies
         top5 = Movie.all.sort_by(&:average_user_rating).reverse[0..4]
         top5.map do |movie|
