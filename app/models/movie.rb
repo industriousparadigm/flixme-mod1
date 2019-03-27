@@ -2,6 +2,21 @@ class Movie < ActiveRecord::Base
     has_many :reviews
     has_many :users, through: :review
 
+    def self.get_tmdb_movies(pages = 1)
+    # this populates the database with X pages from The Internet
+    # Movie Database, defaulting to 1 page with 20 results
+        url = "https://api.themoviedb.org/3/movie/top_rated?api_key=b90e3d41e6ca35ff7dbd3597740c1ca6&language=en-US&page=1"
+        response = RestClient.get(url)
+        data = JSON.parse(response)
+        data["results"].each do |movie_hash|
+            Movie.find_or_create_by(
+                title: movie_hash["title"],
+                release_year: movie_hash["release_date"][0..3].to_i,
+                tmdb_rating: movie_hash["vote_average"].to_f
+            )
+        end
+    end
+
     def get_reviews
         Review.all.select { |review| review.movie_id == self.id }
     end
