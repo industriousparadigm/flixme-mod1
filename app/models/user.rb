@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
 
         # now with 10 movies no one has seen, we return a juicy array of their titles
         # together with their release year and converted rating
-        recommendations.map do
+        recommendations.map do |movie|
             "#{movie.title} (#{movie.release_year}): #{movie.tmdb_rating}"
         end
 

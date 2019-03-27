@@ -5,16 +5,24 @@ class Movie < ActiveRecord::Base
     def self.get_tmdb_movies(pages = 1)
     # this populates the database with X pages from The Internet
     # Movie Database, defaulting to 1 page with 20 results
+        current_page = 1
         url = "https://api.themoviedb.org/3/movie/top_rated?api_key=b90e3d41e6ca35ff7dbd3597740c1ca6&language=en-US&page=1"
-        response = RestClient.get(url)
-        data = JSON.parse(response)
-        data["results"].each do |movie_hash|
-            Movie.find_or_create_by(
-                title: movie_hash["title"],
-                release_year: movie_hash["release_date"][0..3].to_i,
-                tmdb_rating: movie_hash["vote_average"].to_f
-            )
+
+        pages.times do
+            response = RestClient.get(url)
+            data = JSON.parse(response)
+            data["results"].each do |movie_hash|
+                Movie.find_or_create_by(
+                    title: movie_hash["title"],
+                    release_year: movie_hash["release_date"][0..3].to_i,
+                    tmdb_rating: movie_hash["vote_average"].to_f / 2
+                )
+            end
+            
+            current_page += 1
+            url = url.chop + current_page.to_s
         end
+    
     end
 
     def get_reviews
