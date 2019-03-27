@@ -22,6 +22,46 @@ class User < ActiveRecord::Base
         Review.find(target_id).update_attributes(rating: new_rating, comments: new_comments)
     end
 
+    def movies_watched
+        self.reviews.map { |review| review.movie }
+    end
+
+    def get_recommendations(friend_names = [])
+        # returns a list of top 10 movies that neither me nor my friends have seen
+        
+        # first let's get a unique array of movies everyone in the group watched
+        ineligible_movies = []
+
+        self.movies_watched.each { |movie| ineligible_movies << movie }
+
+        friend_objs = friend_names.map { |name| User.find_by(name: name) }
+
+        friend_objs.each do |friend|
+            friend.movies_watched.each { |movie| ineligible_movies << movie }
+        end
+
+        ineligible_movies.uniq
+
+        # now we iterate the top rated movies in the entire database
+        # until we find 10 movies that no one has seen
+        matches_found = 0
+        recommendations = []
+        Movie.all.sort_by(&:tmdb_rating).reverse.each do |movie|
+            if !ineligible_movies.include?(movie)
+                recommendations << movie
+                matches_found += 1                
+            end
+            break if matches_found >= 10
+        end
+
+        # now with 10 movies no one has seen, we return a juicy array of their titles
+        # together with their release year and converted rating
+        recommendations.map do
+            "#{movie.title} (#{movie.release_year}): #{movie.tmdb_rating}"
+        end
+
+    end
+
     def self.most_active_reviewer #Return the user with most reviews
         winner = User.all.sort_by do |user|
             user.reviews.size
