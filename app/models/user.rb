@@ -43,7 +43,7 @@ class User < ActiveRecord::Base
         recommendations = []
         count = 0
         while count <= 5
-            movie = Movie.find(rand(1..Movie.all.size))
+            movie = Movie.find(rand(Movie.first.id..Movie.last.id))
             if !ineligible_movies.include?(movie)
                 recommendations << movie
                 count += 1

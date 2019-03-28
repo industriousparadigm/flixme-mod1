@@ -1,7 +1,6 @@
 class Movie < ActiveRecord::Base
     has_many :reviews
     has_many :users, through: :reviews
-=======
     serialize :genre_ids
 
     GENRES = [
@@ -82,6 +81,10 @@ class Movie < ActiveRecord::Base
           "name": "Western"
         }
       ]
+
+    def self.list_all_genres
+       GENRES.map { |genre| genre[:name] }
+    end
 
     def self.get_genre_by_id(id)
         GENRES.find { |genre| genre[:id] == id }[:name]

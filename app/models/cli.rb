@@ -5,10 +5,11 @@ class CLI
   FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
   RECOMMEND_MENU = ["Just for me", "With friends"]
   RECOMMEND_MENU_REFINED = ["Top Movies", "By Genres", "Random"]
-  GENRE_MENU = Movie.GENRES.map{ |i| i[:name]}
+  GENRE_MENU = []
   #MENUS AND SUBMENUS COSTANTS ARRAYS
   def initialize
     @prompt = TTY::Prompt.new
+    GENRE_MENU.concat(get_genres)
   end
 
   def normalizer(string)
@@ -30,6 +31,11 @@ class CLI
     puts ""
     puts "Welcome #{@user.name}!"
   end
+
+  def get_genres
+   Movie.list_all_genres
+  end
+
 
 
   def show_menu
@@ -63,33 +69,37 @@ class CLI
       multilple_recomendation
     when "With friends"
       friends_names = @prompt.multi_select("Select one or more of your friends:",  @user.friends.map(&:name))
-      # puts @user.get_recommendations(friends_array)
       multilple_recomendation(friends_names)
     end
   end
 
   def multilple_recomendation(choices = [])
+    friends = choices
     type_choice = @prompt.select("Select one of the following criteria:", RECOMMEND_MENU_REFINED)
     if choices.size > 0 #with friend
       case type_choice
       when "Top Movies"
-        # @user.get_top_rated_recommendations(choices)
+        @user.get_top_rated_recommendations(friends: friends)
       when "By Genres"
-        genre = @prompt.select("Select one of the following genre:", ["THIS", "THAT"])#GENRE_MENU
+        genre = @prompt.select("Select one of the following genre:", GENRE_MENU)
+        @user.get_recommendations_by_genre(friends: friends, genre: genre)
       when "Random"
-        # @user.get_random_recommendations(choices)
+        @user.get_random_recommendations(friends: friends)
       end
     else #alone
       case type_choice
-        # @user.get_top_rated_recommendations
+      when "Top Movies"
+        @user.get_top_rated_recommendations
       when "By Genres"
-        # @user.get_recommendations_by_genre
+        genre = @prompt.select("Select one of the following genre:", GENRE_MENU)
+        @user.get_recommendations_by_genre(genre: genre)
       when "Random"
-        # @user.get_random_recommendations
+        @user.get_random_recommendations
       end
+    end
   end
 
-  end
+
 
   def reviews_operations
     puts ""
