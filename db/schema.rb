@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 2019_03_25_173351) do
     t.string "title"
     t.integer "release_year"
     t.float "tmdb_rating"
+    t.string "tmdb_synopsis"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
