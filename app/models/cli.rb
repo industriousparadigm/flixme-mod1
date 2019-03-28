@@ -14,8 +14,9 @@ class CLI
   end
 
   def logo
-    puts "                                    FLIX-ME."
+    puts "                                    FLIX-ME"
     puts "                      (Not interested in cool-flashy Logos)"
+    sleep(1)
   end
 
   def get_users_name
@@ -100,7 +101,11 @@ class CLI
     target_title = normalizer(@prompt.ask("What's the name of the movie?"))
     movie = Movie.find_by(title: target_title)
     if movie
-      puts movie.latest_reviews
+      if movie.latest_reviews.size >0
+        puts movie.latest_reviews
+      else
+      puts "No reviews found for the movie. Be the First!"
+      end
     else
     puts "Movie not found."
     end
