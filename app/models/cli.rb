@@ -5,10 +5,14 @@ class CLI
   FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
   RECOMMEND_MENU = ["Just for me", "With friends"]
   RECOMMEND_MENU_REFINED = ["Top Movies", "By Genres", "Random"]
-  GENRE_MENU = Movie.GENRES.map{ |i| i[:name]}
+  GENRE_MENU = []
   #MENUS AND SUBMENUS COSTANTS ARRAYS
   def initialize
     @prompt = TTY::Prompt.new
+  end
+
+  def get_genres
+    Movie.list_all_genres
   end
 
   def normalizer(string)
@@ -273,6 +277,7 @@ class CLI
   end
 
   def start
+    GENRE_MENU.concat(get_genres)
     logo
     get_users_name
     welcome

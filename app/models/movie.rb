@@ -82,6 +82,10 @@ class Movie < ActiveRecord::Base
         }
       ]
 
+    def self.list_all_genres
+        GENRES.map { |genre| genre[:name] }
+    end
+
     def self.get_genre_by_id(id)
         GENRES.find { |genre| genre[:id] == id }[:name]
     end
