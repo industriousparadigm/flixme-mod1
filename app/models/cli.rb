@@ -73,28 +73,27 @@ class CLI
     end
   end
 
-  def multilple_recomendation(choices = [])
-    friends = choices
+  def multilple_recomendation(friends = [])
     type_choice = @prompt.select("Select one of the following criteria:", RECOMMEND_MENU_REFINED)
-    if choices.size > 0 #with friend
+    if friends.size > 0 #with friend
       case type_choice
       when "Top Movies"
-        @user.get_top_rated_recommendations(friends: friends)
+      puts  @user.get_top_rated_recommendations(friends)
       when "By Genres"
         genre = @prompt.select("Select one of the following genre:", GENRE_MENU)
-        @user.get_recommendations_by_genre(friends: friends, genre: genre)
+      puts  @user.get_recommendations_by_genre(genre, friends)
       when "Random"
-        @user.get_random_recommendations(friends: friends)
+      puts  @user.get_random_recommendations(friends)
       end
     else #alone
       case type_choice
       when "Top Movies"
-        @user.get_top_rated_recommendations
+      puts  @user.get_top_rated_recommendations
       when "By Genres"
         genre = @prompt.select("Select one of the following genre:", GENRE_MENU)
-        @user.get_recommendations_by_genre(genre: genre)
+      puts  @user.get_recommendations_by_genre(genre)
       when "Random"
-        @user.get_random_recommendations
+      puts  @user.get_random_recommendations
       end
     end
   end

@@ -75,7 +75,7 @@ class User < ActiveRecord::Base
         end
     end
 
-    def get_recommendation_by_genre(genre_name, friend_names = [])
+    def get_recommendations_by_genre(genre_name, friend_names = [])
         # returns the top 5 movies of a given genre
         ineligible_movies = movies_watched_by_group(get_friends_by_name_list(friend_names))
 
