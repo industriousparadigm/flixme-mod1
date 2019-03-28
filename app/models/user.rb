@@ -26,19 +26,39 @@ class User < ActiveRecord::Base
         self.reviews.map { |review| review.movie }
     end
 
+    def movies_watched_by_group(friend_list)
+        watched = self.movies_watched
+        friend_list.each { |friend|  watched.concat(friend.movies_watched) }
+        watched.uniq
+    end
+
     def get_friends_by_name_list(friend_names)
         friend_names.map { |name| User.find_by(name: name) }
     end
 
-    def get_recommendations(friend_names = [])
-        # returns a list of top 10 movies that neither me nor my friends have seen
+    def get_random_recommendations(friend_names = [])
+        # returns a 5 random movies that neither me nor my friends have seen
+        ineligible_movies = movies_watched_by_group(get_friends_by_name_list(friend_names))
 
-        ineligible_movies = []
-        self.movies_watched.each { |movie| ineligible_movies << movie }
-        get_friends_by_name_list(friend_names).each do |friend|
-            friend.movies_watched.each { |movie| ineligible_movies << movie }
+        recommendations = []
+        count = 0
+        while count <= 5
+            movie = Movie.find(rand(1..Movie.all.size))
+            if !ineligible_movies.include?(movie)
+                recommendations << movie
+                count += 1
+            end
         end
-        ineligible_movies.uniq
+
+        recommendations.map do |movie|
+            "\n#{movie.title} (#{movie.release_year}): #{movie.tmdb_rating}/5\n#{movie.tmdb_synopsis}"
+        end
+    end
+
+    def get_top_rated_recommendations(friend_names = [])
+        # returns a list of top 5 movies that neither me nor my friends have seen
+
+        ineligible_movies = movies_watched_by_group(get_friends_by_name_list(friend_names))
 
         recommendations = []
         matches_found = 0
@@ -47,12 +67,32 @@ class User < ActiveRecord::Base
                 recommendations << movie
                 matches_found += 1
             end
-            break if matches_found >= 10
+            break if matches_found >= 5
         end
 
         recommendations.map do |movie|
-            "#{movie.title} (#{movie.release_year}): #{movie.tmdb_rating}"
+            "\n#{movie.title} (#{movie.release_year}): #{movie.tmdb_rating}/5\n#{movie.tmdb_synopsis}"
         end
+    end
+
+    def get_recommendation_by_genre(genre_name, friend_names = [])
+        # returns the top 5 movies of a given genre
+        ineligible_movies = movies_watched_by_group(get_friends_by_name_list(friend_names))
+
+        recommendations = []
+        matches_found = 0
+        Movie.all.sort_by(&:tmdb_rating).reverse.each do |movie|
+            if !ineligible_movies.include?(movie) && movie.has_genre?(genre_name)
+                recommendations << movie
+                matches_found += 1
+            end
+            break if matches_found >= 5
+        end
+
+        recommendations.map do |movie|
+            "\n#{movie.title} (#{movie.release_year}): #{movie.tmdb_rating}/5\n#{movie.tmdb_synopsis}"
+        end
+
     end
 
     def self.most_active_reviewer #Return the user with most reviews
