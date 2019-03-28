@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
     has_many :reviews
-    has_many :movies, through: :review
+    has_many :movies, through: :reviews
 
     has_and_belongs_to_many :friendships,
       class_name: "User",
