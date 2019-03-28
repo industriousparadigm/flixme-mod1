@@ -2,7 +2,7 @@ class CLI
   MAIN_MENU= ["Rate a Movie", "Get a movie recommendation", "Friends", "Reviews", "Fun Facts", "Exit Flix-Me"]
   REVIEW_OPTIONS = ["Show movie reviews", "Browse my reviews", "Add new Review", "Update an existing review", "Delete an existing review", "Return to main menu"]
   FRIENDLIST_OPTIONS = ["Show my FriendList", "Show friend reviews", "Add new Friend", "Delete Friend", "Back to main menu"]
-  FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
+  FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "How many movies does this database contains?", "Most active reviewer", "Back to main menu"]
   RECOMMEND_MENU = ["Just for me", "With friends"]
   RECOMMEND_MENU_REFINED = ["Top Movies", "By Genres", "Random"]
   GENRE_MENU = []
@@ -35,8 +35,6 @@ class CLI
   def get_genres
    Movie.list_all_genres
   end
-
-
 
   def show_menu
     puts ""
@@ -114,18 +112,10 @@ class CLI
         show_movie_reviews
       when "Delete an existing review"
         user_reviews = get_reviews
-        if user_reviews.size > 0
-          delete_review
-        else
-          puts "No review to delete"
-        end
+        user_reviews.size > 0 ? (delete_review) : (puts "No review to delete")
       when "Update an existing review"
         user_reviews = get_reviews
-        if user_reviews.size > 0
-          update_existing_review
-        else
-          puts "No review to update"
-        end
+        user_reviews.size > 0 ? (update_existing_review) : (puts "No review to update")
       when "Return to main menu"
         return
       end
@@ -138,19 +128,11 @@ class CLI
       when 0
         puts "Movie not found."
       when 1
-        if movies.first.latest_reviews.size > 0
-          puts movies.first.latest_reviews
-        else
-         puts "No reviews submitted for the selected movie. Be the first!"
-        end
+        movies.first.latest_reviews.size > 0 ? (puts movies.first.latest_reviews) : (puts "No reviews submitted for the selected movie. Be the first!")
       else
       choice = @prompt.select("Multiple movies found, select one of the following:", movies.map(&:title))
       reviews =movies.find{|i| i.title == choice}.latest_reviews
-      if reviews.size > 0
-        puts reviews
-      else
-        puts "No reviews submitted for the selected movie. Be the first!"
-      end
+      reviews.size > 0 ? (puts reviews) : (puts "No reviews submitted for the selected movie. Be the first!")
     end
   end
 
@@ -162,7 +144,7 @@ class CLI
     end
     new_review = @prompt.ask("Type a new review for the movie: #{movie_name}")
     @user.update_review(movie_name, new_rating.to_i, new_review)
-    @user = User.find_or_create_by(name: @user.name)
+    @user.reload
     puts "You successfully update the review of #{movie_name}"
   end
 
@@ -173,18 +155,13 @@ class CLI
   def delete_review
     movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
     @user.delete_review(movie_name)
-    @user = User.find_or_create_by(name: @user.name)
-    # @user = User.find_or_create_by(name: @user.name) #MAGIC!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    @user.reload
     puts "You deleted the review of #{movie_name}" #refracted
   end
 
   def browser_user_reviews
     user_reviews = get_reviews
-    if user_reviews.size > 0
-      puts user_reviews
-    else
-      puts "You have not reviewed anything. Get your opinion out there!"
-    end #refracted #refracted
+    user_reviews.size > 0 ? (puts user_reviews) : (puts "You have not reviewed anything. Get your opinion out there!")
   end
 
   def get_movies_by_name
@@ -200,11 +177,7 @@ class CLI
         when 0
           puts "Movie not found."
         when 1
-          if @user.movies.include?(movies.first)
-            "You have already reviewed this movie."
-          else
-            write_review(movies.first)
-          end
+          @user.movies.include?(movies.first) ? (puts "You have already reviewed this movie.") : (write_review(movies.first))
         else
         choice = @prompt.select("Multiple movies found, select one of the following:", movies.map(&:title))
         write_review(choice)
@@ -297,6 +270,8 @@ class CLI
       puts Movie.top_5_movies
     elsif choice == "Most active reviewer"
       puts User.most_active_reviewer
+    elsif choice == "How many movies does this database contains?"
+      puts "The database actually has #{Movie.all.size} movies"
     elsif choice == "Back to main menu"
       return
     end  #refracted
