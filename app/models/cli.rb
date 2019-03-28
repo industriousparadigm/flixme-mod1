@@ -4,6 +4,8 @@ class CLI
   FRIENDLIST_OPTIONS = ["Show my FriendList", "Show friend reviews", "Add new Friend", "Delete Friend", "Back to main menu"]
   FUN_FACTS = ["Find the top 5 movies", "Most reviewed movie", "Most active reviewer", "Back to main menu"]
   RECOMMEND_MENU = ["Just for me", "With friends"]
+  RECOMMEND_MENU_REFINED = ["Top Movies", "By Genres", "Random"]
+  GENRE_MENU = Movie.GENRES.map{ |i| i[:name]}
   #MENUS AND SUBMENUS COSTANTS ARRAYS
   def initialize
     @prompt = TTY::Prompt.new
@@ -14,8 +16,9 @@ class CLI
   end
 
   def logo
-    puts "                                    FLIX-ME."
+    puts "                                    FLIX-ME"
     puts "                      (Not interested in cool-flashy Logos)"
+    sleep(1)
   end
 
   def get_users_name
@@ -57,11 +60,35 @@ class CLI
     puts ""
     case choice
     when "Just for me"
-      puts  @user.get_recommendations
+      multilple_recomendation
     when "With friends"
-      friends_array = @prompt.multi_select("Select one or more of your friends:",  @user.friends.map(&:name))
-      puts @user.get_recommendations(friends_array)
+      friends_names = @prompt.multi_select("Select one or more of your friends:",  @user.friends.map(&:name))
+      # puts @user.get_recommendations(friends_array)
+      multilple_recomendation(friends_names)
     end
+  end
+
+  def multilple_recomendation(choices = [])
+    type_choice = @prompt.select("Select one of the following criteria:", RECOMMEND_MENU_REFINED)
+    if choices.size > 0 #with friend
+      case type_choice
+      when "Top Movies"
+        # @user.get_top_rated_recommendations(choices)
+      when "By Genres"
+        genre = @prompt.select("Select one of the following genre:", ["THIS", "THAT"])#GENRE_MENU
+      when "Random"
+        # @user.get_random_recommendations(choices)
+      end
+    else #alone
+      case type_choice
+        # @user.get_top_rated_recommendations
+      when "By Genres"
+        # @user.get_recommendations_by_genre
+      when "Random"
+        # @user.get_random_recommendations
+      end
+  end
+
   end
 
   def reviews_operations
@@ -97,21 +124,32 @@ class CLI
   end
 
   def show_movie_reviews
-    target_title = normalizer(@prompt.ask("What's the name of the movie?"))
-    movie = Movie.find_by(title: target_title)
-    if movie
-      puts movie.latest_reviews
-    else
-    puts "Movie not found."
+    movies = get_movies_by_name
+    case movies.size
+      when 0
+        puts "Movie not found."
+      when 1
+        if movies.first.latest_reviews.size > 0
+          puts movies.first.latest_reviews
+        else
+         puts "No reviews submitted for the selected movie. Be the first!"
+        end
+      else
+      choice = @prompt.select("Multiple movies found, select one of the following:", movies.map(&:title))
+      reviews =movies.find{|i| i.title == choice}.latest_reviews
+      if reviews.size > 0
+        puts reviews
+      else
+        puts "No reviews submitted for the selected movie. Be the first!"
+      end
     end
   end
-
 
   def update_existing_review
     movie_name = @prompt.select("Select one of the following:", @user.reviews.map{ |i| i.movie.title })
     new_rating = @prompt.ask('Leave a new rating (1-5) ') do |i|
       i.in '1-5'
-      i.messages[:range?] = '%{value} out of expected range #{in}'
+      i.messages[:range?] = 'You cannot vote it %{value}.'
     end
     new_review = @prompt.ask("Type a new review for the movie: #{movie_name}")
     @user.update_review(movie_name, new_rating.to_i, new_review)
@@ -140,28 +178,39 @@ class CLI
     end #refracted #refracted
   end
 
+  def get_movies_by_name
+    target_title = @prompt.ask("What's the name of the movie?").downcase
+    movie_titles = Movie.all.map(&:title).select{ |i| i.downcase.include?(target_title)}
+    movies = movie_titles.map {|i| Movie.find_by(title: i)}
+  end
+
   def add_new_review
     puts ""
-    temp_target_movie = normalizer(@prompt.ask("What movie would you like to review?"))
-    if Movie.all.map(&:title).include?(temp_target_movie)
-      if !@user.reviews.map{ |i| i.movie.title }.include?(temp_target_movie)
-        target_movie = temp_target_movie
-      else
-        puts "You have reviewed this movie, already" #maybe update
-        return
+      movies = get_movies_by_name
+      case movies.size
+        when 0
+          puts "Movie not found."
+        when 1
+          if @user.movies.include?(movies.first)
+            "You have already reviewed this movie."
+          else
+            write_review(movies.first)
+          end
+        else
+        choice = @prompt.select("Multiple movies found, select one of the following:", movies.map(&:title))
+        write_review(choice)
       end
-      target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
-        i.in '1-5'
-        i.messages[:range?] = 'You cannot vote %{value}'
-      end
-      target_comment = @prompt.ask("Any additional comment?")
+  end #REFRACT THIS
 
-      @user.review_movie(target_movie, target_rating, target_comment)
-      puts "Rewiews submitted"
-      @user = User.find_or_create_by(name: @user.name)
-    else
-      puts "Movie not found!"
+  def write_review(choice)
+    target_rating = @prompt.ask('How would your rate it? (1-5) ') do |i|
+      i.in '1-5'
+      i.messages[:range?] = 'You cannot vote %{value}.'
     end
+    target_comment = @prompt.ask("Any additional comment?")
+    @user.review_movie(choice, target_rating, target_comment)
+    puts "Rewiews submitted"
+    @user.reload
   end
 
   def friend_list_operations

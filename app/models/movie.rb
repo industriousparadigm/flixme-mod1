@@ -117,10 +117,10 @@ class Movie < ActiveRecord::Base
         end
     end
 
-    def latest_reviews(n = 5)  
+    def latest_reviews(n = 5)
         n = self.reviews.size if n > self.reviews.size
         last_n_reviews = self.reviews[-n..-1]
-        
+
         last_n_reviews.map do |review|
             "#{review.user.name} wrote:
             #{review.comments}
@@ -158,7 +158,7 @@ class Movie < ActiveRecord::Base
                     movie.genre_ids = movie_hash["genre_ids"]
                 end
             end
-            
+
             current_page += 1
             url = "https://api.themoviedb.org/3/movie/top_rated?api_key=b90e3d41e6ca35ff7dbd3597740c1ca6&language=en-US&page=#{current_page.to_s}"
         end
