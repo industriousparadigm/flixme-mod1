@@ -1,9 +1,109 @@
 class Movie < ActiveRecord::Base
     has_many :reviews
-    has_many :users, through: :review
+    has_many :users, through: :reviews
+    serialize :genre_ids
+
+    GENRES = [
+        {
+          "id": 28,
+          "name": "Action"
+        },
+        {
+          "id": 12,
+          "name": "Adventure"
+        },
+        {
+          "id": 16,
+          "name": "Animation"
+        },
+        {
+          "id": 35,
+          "name": "Comedy"
+        },
+        {
+          "id": 80,
+          "name": "Crime"
+        },
+        {
+          "id": 99,
+          "name": "Documentary"
+        },
+        {
+          "id": 18,
+          "name": "Drama"
+        },
+        {
+          "id": 10751,
+          "name": "Family"
+        },
+        {
+          "id": 14,
+          "name": "Fantasy"
+        },
+        {
+          "id": 36,
+          "name": "History"
+        },
+        {
+          "id": 27,
+          "name": "Horror"
+        },
+        {
+          "id": 10402,
+          "name": "Music"
+        },
+        {
+          "id": 9648,
+          "name": "Mystery"
+        },
+        {
+          "id": 10749,
+          "name": "Romance"
+        },
+        {
+          "id": 878,
+          "name": "Science Fiction"
+        },
+        {
+          "id": 10770,
+          "name": "TV Movie"
+        },
+        {
+          "id": 53,
+          "name": "Thriller"
+        },
+        {
+          "id": 10752,
+          "name": "War"
+        },
+        {
+          "id": 37,
+          "name": "Western"
+        }
+      ]
+
+    def self.get_genre_by_id(id)
+        GENRES.find { |genre| genre[:id] == id }[:name]
+    end
+
+    def self.get_genre_by_name(genre_name)
+        GENRES.find { |genre| genre[:name] == genre_name }[:id]
+    end
+
+    def has_genre?(genre_name)
+        self.genre_ids.include?(Movie.get_genre_by_name(genre_name))
+    end
 
     def get_reviews
         Review.all.select { |review| review.movie_id == self.id }
+    end
+
+    def self.get_all_genres
+        GENRES.map { |genre| genre[:name] }
+    end
+
+    def get_all_by_genre(genres)
+        Movie.all.select { |movie| movie.genre == genre }
     end
 
     def average_user_rating
@@ -55,6 +155,7 @@ class Movie < ActiveRecord::Base
                     movie.release_year = movie_hash["release_date"][0..3].to_i
                     movie.tmdb_rating = movie_hash["vote_average"].to_f / 2
                     movie.tmdb_synopsis = movie_hash["overview"]
+                    movie.genre_ids = movie_hash["genre_ids"]
                 end
             end
             
