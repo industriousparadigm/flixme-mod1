@@ -23,7 +23,15 @@ class User < ActiveRecord::Base
     end
 
     def movies_watched
-        self.reviews.map { |review| review.movie }
+        self.reviews.map(&:movie)
+    end
+
+    def titles_of_movies_watched
+        movies_watched.map(&:title)
+    end
+
+    def get_friends_names
+        self.friends.map(&:name)
     end
 
     def movies_watched_by_group(friend_list)

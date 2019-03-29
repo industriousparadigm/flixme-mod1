@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 2019_03_28_140927) do
     t.string "tmdb_synopsis"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "genre_ids", default: "--- []\n"
+    t.text "genres", default: "--- []\n"
   end
 
   create_table "reviews", force: :cascade do |t|

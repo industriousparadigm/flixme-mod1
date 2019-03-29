@@ -150,7 +150,7 @@ class CLI
   end
 
   def get_reviews
-    @user.reviews.map(&:format_review) #refracted
+    @user.reviews.map(:&form) #refracted
   end
 
   def delete_review

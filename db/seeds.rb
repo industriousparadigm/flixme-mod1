@@ -25,7 +25,7 @@ f7 = Friendship.create(user: riccardo, friend_id: john.id)
 f8 = Friendship.create(user: mariana, friend_id: diogo.id)
 f9 = Friendship.create(user: diana, friend_id: mariana.id)
 
-Movie.get_tmdb_movies(600)
+# Movie.get_tmdb_movies(950)
 
 # starwars = Movie.create(title: "Star Wars", release_year: 1977, tmdb_rating: 4.5)
 # et = Movie.create(title: "E.T.", release_year: 1982, tmdb_rating: 4.55)
