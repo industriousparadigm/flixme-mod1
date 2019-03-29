@@ -22,6 +22,10 @@ class User < ActiveRecord::Base
         Review.find(target_id).update_attributes(rating: new_rating, comments: new_comments)
     end
 
+    def format_all_reviews
+        self.reviews.map(&:format_review)
+    end
+
     def movies_watched
         self.reviews.map(&:movie)
     end

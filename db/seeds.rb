@@ -1,5 +1,5 @@
 
-Movie.destroy_all
+# Movie.destroy_all
 User.destroy_all
 Review.destroy_all
 Friendship.destroy_all
@@ -27,16 +27,9 @@ f9 = Friendship.create(user: diana, friend_id: mariana.id)
 
 # Movie.get_tmdb_movies(950)
 
-# starwars = Movie.create(title: "Star Wars", release_year: 1977, tmdb_rating: 4.5)
-# et = Movie.create(title: "E.T.", release_year: 1982, tmdb_rating: 4.55)
-# roma = Movie.create(title: "Roma", release_year: 2018, tmdb_rating: 4.8)
-# birdman = Movie.create(title: "Birdman", release_year: 2014, tmdb_rating: 4.4)
-veronicamars = Movie.create(title: "Veronica Mars", release_year: 2014, tmdb_rating: 3.4, tmdb_synopsis: "Years after walking away from her past as a teenage private eye, Veronica Mars gets pulled back to her hometown - just in time for her high school reunion - in order to help her old flame Logan Echolls, who's embroiled in a murder mystery.")
-mammamia = Movie.create(title: "Mamma Mia!", release_year: 2008, tmdb_rating: 3.5, tmdb_synopsis: "An independent, single mother who owns a small hotel on a Greek island is about to marry off the spirited young daughter she's raised alone. But, the daughter has secretly invited three of her mother's ex-lovers in the hopes of finding her biological father.")
-rocknrolla = Movie.create(title: "RockNRolla", release_year: 2008, tmdb_rating: 3.5, tmdb_synopsis: "When a Russian mobster sets up a real estate scam that generates millions of pounds, various members of London's criminal underworld pursue their share of the fortune. Various shady characters, including Mr One-Two, Stella the accountant, and Johnny Quid, a druggie rock-star, try to claim their slice.")
-# thebigshort = Movie.create(title: "The Big Short", release_year: 2015, tmdb_rating: 4.05)
-# moana = Movie.create(title: "Moana", release_year: 2016, tmdb_rating: 4.05)
-# peppa = Movie.create(title: "Peppa The Pig", release_year: 2019, tmdb_rating: 2)
+# veronicamars = Movie.create(title: "Veronica Mars", release_year: 2014, tmdb_rating: 3.4, tmdb_synopsis: "Years after walking away from her past as a teenage private eye, Veronica Mars gets pulled back to her hometown - just in time for her high school reunion - in order to help her old flame Logan Echolls, who's embroiled in a murder mystery.")
+# mammamia = Movie.create(title: "Mamma Mia!", release_year: 2008, tmdb_rating: 3.5, tmdb_synopsis: "An independent, single mother who owns a small hotel on a Greek island is about to marry off the spirited young daughter she's raised alone. But, the daughter has secretly invited three of her mother's ex-lovers in the hopes of finding her biological father.")
+# rocknrolla = Movie.create(title: "RockNRolla", release_year: 2008, tmdb_rating: 3.5, tmdb_synopsis: "When a Russian mobster sets up a real estate scam that generates millions of pounds, various members of London's criminal underworld pursue their share of the fortune. Various shady characters, including Mr One-Two, Stella the accountant, and Johnny Quid, a druggie rock-star, try to claim their slice.")
 
 riccardo.review_movie("Star Wars", 5, "what a classic!")
 diogo.review_movie("Veronica Mars", 5, "marshmallows rejoice, she is BACK")
