@@ -122,6 +122,7 @@ class User < ActiveRecord::Base
     def add_friend_by_name(name)
         if self.friends.map(&:name).include?(name)
             puts "You are already friends!"
+            false
         else
             Friendship.create(user_id: self.id, friend_id: User.find_by(name: name).id)
         end

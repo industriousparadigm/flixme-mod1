@@ -28,7 +28,7 @@ class CLI
     end
 
     def ask(question)
-    @prompt.ask(question)
+    @prompt.ask(question, required: true)
     end
 
     def single_select(question, options)
@@ -103,8 +103,6 @@ class CLI
       end
     end
 
-
-
     def reviews_operations
         choice = single_select("Select one of the following:", REVIEW_OPTIONS)
         case choice
@@ -115,11 +113,9 @@ class CLI
           when "Show movie reviews"
             show_movie_reviews
           when "Delete an existing review"
-            user_reviews = get_reviews
-            user_reviews.size > 0 ? (delete_review) : (puts "\nNo review to delete")
+            @user.format_all_reviews.size > 0 ? (delete_review) : (puts "\nNo review to delete")
           when "Update an existing review"
-            user_reviews = get_reviews
-            user_reviews.size > 0 ? (update_existing_review) : (puts "\nNo review to update")
+            @user.format_all_reviews.size > 0 ? (update_existing_review) : (puts "\nNo review to update")
           when "Return to main menu"
             return
         end
@@ -151,10 +147,6 @@ class CLI
       puts "\nYou successfully update the review of #{movie_name}"
     end
 
-    def get_reviews
-      @user.reviews.map(&:format_review) #refracted
-    end
-
     def delete_review
       movie_name =single_select("Select one of the following:", @user.titles_of_movies_watched)
       @user.delete_review(movie_name)
@@ -163,7 +155,7 @@ class CLI
     end
 
     def browser_user_reviews
-      user_reviews = get_reviews
+      user_reviews = @user.format_all_reviews
       user_reviews.size > 0 ? (puts user_reviews) : (puts "\nYou have not reviewed anything. Get your opinion out there!")
     end
 
@@ -234,13 +226,12 @@ class CLI
 
     def add_new_friend
       temp_target_friend = normalizer(ask("Who would you like to add"))
-      if temp_target_friend == @user.name
-        puts "\nUser trying to add himself as friend, FOREVER ALONE DETECTED, COMMENCING SHUTDOWN"
-      elsif User.all.map(&:name).include?(temp_target_friend)
-        @user.add_friend_by_name(temp_target_friend)
-        puts "\n#{@user.name} and #{temp_target_friend} are now friends!"
-      else
-        puts "\nUser not found, returning to FriendList menu"
+        if temp_target_friend == @user.name
+          puts "\nUser trying to add himself as friend, FOREVER ALONE DETECTED, COMMENCING SHUTDOWN"
+        elsif User.find_by(name: temp_target_friend)
+          puts "\n#{@user.name} and #{temp_target_friend} are now friends!" if @user.add_friend_by_name(temp_target_friend)
+        else
+          puts "\nUser not found, returning to FriendList menu"
       end
     end
 
